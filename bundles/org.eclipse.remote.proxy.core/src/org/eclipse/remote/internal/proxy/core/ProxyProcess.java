@@ -18,11 +18,10 @@ import org.eclipse.remote.core.IRemoteProcess;
 import org.eclipse.remote.core.IRemoteProcessBuilder;
 import org.eclipse.remote.core.IRemoteProcessControlService;
 import org.eclipse.remote.core.IRemoteProcessTerminalService;
-import org.eclipse.remote.internal.core.RemoteProcess;
+import org.eclipse.remote.core.RemoteProcess;
 
 public class ProxyProcess extends RemoteProcess implements IRemoteProcessControlService, IRemoteProcessTerminalService {
 	private IRemoteProcess remoteProcess;
-	private int width, height;
 	private final InputStream procStdout;
 	private final InputStream procStderr;
 	private final OutputStream procStdin;
@@ -94,7 +93,7 @@ public class ProxyProcess extends RemoteProcess implements IRemoteProcessControl
 	@Override
 	public int exitValue() {
 		if (!isCompleted) {
-			throw new IllegalStateException();
+			throw new IllegalThreadStateException();
 		}
 		return exitValue;
 	}

@@ -36,6 +36,8 @@ public class ServerExecCommand extends AbstractServerCommand {
 	private final DataOutputStream result;
 	private final DataInputStream cmd;
 	
+	private Process proc;
+	
 	private class CommandRunner implements Runnable {
 		@Override
 		public void run() {
@@ -61,24 +63,32 @@ public class ServerExecCommand extends AbstractServerCommand {
 			}
 			builder.redirectErrorStream(redirect);
 			try {
-				Process proc = builder.start();
+				proc = builder.start();
 				startForwarder("stdout", proc.getInputStream(), stdout);
 				startForwarder("stderr", proc.getErrorStream(), stderr);
 				startForwarder("stdin", stdin, proc.getOutputStream());
 				System.err.println("waiting for proc");
-				while (cmd.available() == 0 && proc.isAlive()) {
-					Thread.sleep(500);
-				}
-				System.err.println("done waiting for proc");
-				if (cmd.available() > 0) {
-					cmd.readByte();
-					proc.destroyForcibly();
-				}
+				new Thread(new ProcMonitor(), "process monitor").start();
 				int exit = proc.waitFor();
 				System.err.println("exit status="+exit);
 				result.writeInt(exit);
+				result.flush();
 			} catch (IOException | InterruptedException e) {
 				// Ignore?
+			}
+		}
+	}
+	
+	private class ProcMonitor implements Runnable {
+		@Override
+		public void run() {
+			try {
+				cmd.readByte();
+				if (proc.isAlive()) {
+					proc.destroyForcibly();
+				}
+			} catch (IOException e) {
+				// Finish
 			}
 		}
 	}

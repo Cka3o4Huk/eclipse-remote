@@ -42,10 +42,6 @@ import org.eclipse.remote.proxy.core.exceptions.ProxyException;
 public class ProxyConnection implements IRemoteConnectionControlService,
 		IRemoteConnectionChangeListener, IRemoteProxyService, IRemoteProcessService {
 
-	private final boolean logging = false;
-
-	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
-
 	private String fWorkingDir;
 	private ChannelMultiplexer channelMux;
 	private MultiplexedChannel commandChannel;
@@ -121,7 +117,7 @@ public class ProxyConnection implements IRemoteConnectionControlService,
 
 	@Override
 	public void setStreams(InputStream in, OutputStream out) {
-		channelMux = new ChannelMultiplexer("", this, in, out);
+		channelMux = new ChannelMultiplexer("C", this, in, out);
 	}
 
 	/*
@@ -228,6 +224,7 @@ public class ProxyConnection implements IRemoteConnectionControlService,
 	private StringBuffer stdout = new StringBuffer();
 	private StringBuffer stderr = new StringBuffer();
 	
+	@SuppressWarnings("unused")
 	private String executeCommand(List<String> command, IProgressMonitor monitor) throws ProxyException {
 		try {
 			final MultiplexedChannel chanA = channelMux.openChannel();

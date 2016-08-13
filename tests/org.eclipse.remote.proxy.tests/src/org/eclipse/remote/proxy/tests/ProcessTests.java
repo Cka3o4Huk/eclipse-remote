@@ -114,9 +114,15 @@ public class ProcessTests extends TestCase {
 				public void run() {
 					try {
 						BufferedReader stdout = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-						String line;
-						while ((line = stdout.readLine()) != null) {
+						String line = stdout.readLine();
+						int count = Integer.parseInt(line);
+						for (int i = 0 ; i < count; i++) {
+							line = stdout.readLine();
+							if (line == null) {
+								break;
+							}
 							result.append(line);
+							System.out.println(line);
 						}
 						try {
 							proc.destroy();
@@ -136,12 +142,15 @@ public class ProcessTests extends TestCase {
 				public void run() {
 					try {
 						BufferedWriter stdin = new BufferedWriter(new OutputStreamWriter(proc.getOutputStream()));
+						int count = 10;
+						String line = count + "\n";
+						stdin.write(line);
+						stdin.flush();
 						for (int i = 0; i < 10; i++) {
-							String line = i + "\n";
-							stdin.append(line);
+							line = i + "\n";
+							stdin.write(line);
 							stdin.flush();
 						}
-						proc.getOutputStream().close();
 						try {
 							proc.waitFor();
 						} catch (InterruptedException e) {
@@ -170,7 +179,7 @@ public class ProcessTests extends TestCase {
 	}
 
 	public void testExitValue() {
-		IRemoteProcessBuilder builder = processService.getProcessBuilder(new String[]{"sleep","60"}); //$NON-NLS-1$
+		IRemoteProcessBuilder builder = processService.getProcessBuilder(new String[]{"sleep","50"}); //$NON-NLS-1$
 		assertNotNull(builder);
 		IRemoteProcess rp = null;
 		try {
@@ -187,6 +196,13 @@ public class ProcessTests extends TestCase {
 		} catch(IllegalThreadStateException e) {
 			e.printStackTrace();
 		}
+		try {
+			p.destroyForcibly();
+			p.waitFor();
+		} catch (InterruptedException e) {
+			fail(e.getMessage());
+		}
+		assertFalse(p.isAlive());
 	}
 	
 	/*
