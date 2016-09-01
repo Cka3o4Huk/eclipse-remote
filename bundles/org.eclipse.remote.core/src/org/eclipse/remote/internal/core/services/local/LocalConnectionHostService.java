@@ -51,16 +51,6 @@ public class LocalConnectionHostService implements IRemoteConnectionHostService 
 	}
 
 	@Override
-	public String getPassphrase() {
-		return ""; //$NON-NLS-1$
-	}
-
-	@Override
-	public String getPassword() {
-		return ""; //$NON-NLS-1$
-	}
-
-	@Override
 	public int getPort() {
 		return 0;
 	}
@@ -118,10 +108,5 @@ public class LocalConnectionHostService implements IRemoteConnectionHostService 
 	@Override
 	public void setUsername(String username) {
 		// Ignored
-	}
-
-	@Override
-	public boolean usePassword() {
-		return false;
 	}
 }
